@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block start %}
+
+
+<section xmlns="http://www.w3.org/1999/html">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-xl-5 mx-auto"><img class="img-fluid mb-7"
+                    src="/media/{{object.image}}"
+                    alt=""></div>
+        </div>
+                    <h2>Content</h2>
+                    {{object.content|safe}}
+    <br>
+</section>
+<hr>
+<!-- LIKES -->
+{% if user.is_authenticated %}
+  <form action="{% url 'blogpost_like' object.slug %}" method="POST">
+	{% csrf_token %}
+      <p align="right">
+	{% if post_is_liked %}
+	<button  type="submit" name="blogpost_id" value="{{object.id}}" class="btn btn-info">Unlike</button>
+	{% else %}
+	<button type="submit" name="blogpost_id" value="{{object.id}}" class="btn btn-info">Like</button>
+	{% endif %}
+        </p>
+  </form>
+{% else %}
+          <p align="right">
+  <a class="btn btn-outline-info" href="{% url 'login' %}?next={{request.path}}">Log in to like this article!</a><br>
+      </p>
+{% endif %}
+          <p align="right">
+<strong class="text-secondary">{{ number_of_likes }} Like{{ number_of_likes|pluralize }}</strong>
+    </p>
+
+<hr>
+<!-- COMMENTS  -->
+<h4>Leave your comment!</h4>
+<div id="comments_section">
+
+  {% if user.is_authenticated %}
+  <form method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+      {{ comment_form }}
+      <button class="btn btn-info" type="submit">Add comment <i class="fas fa-comments"></i></button>
+    </div>
+  </form>
+  {% else %}
+    <div>
+        <div>
+  <a class="btn btn-outline-info" href="{% url 'login' %}?next={{request.path}}">Log in to add a comment!</a><br>
+        </div></br>
+    </div>
+  {% endif %}
+   <div>
+        <div>
+  {% if comments %}
+  <strong class="text-secondary">{{ object.number_of_comments }} Comment{{ object.number_of_comments|pluralize }}</strong>
+        </div>
+    </div>
+  <hr>
+  <ul>
+    {% for comment in comments %}
+    <li>
+     <div>
+        <span>
+          <strong class="text-info">{{ comment.author }} </strong>
+          <small class="text-muted">{{ comment.date_posted }}</small>
+        </span>
+        <p>
+          {{ comment.content|safe }}
+        </p>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    <strong class="text-secondary">No comments yet...</strong>
+        <br>
+    </div>
+        </br>
+  {% endif %}
+    </div>
+
+</div>
+
+
+
+{% endblock %}
